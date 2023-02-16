@@ -1,0 +1,165 @@
+---
+title: "Lab 3"
+author: "Name here"
+output: pdf_document
+---
+
+### Q1. (6 points)
+
+We previously calculated the marginal probability that dealer "busts" in black jack. Now consider the conditional probability of a bust, give a specific card showing. In particular, what is the probability that dealer busts given they have 
+
+- a Jack showing
+- a 6 showing
+- a 2 showing
+
+To simplify the calculation (albeit not being entirely correct), you can treat all Aces as being worth 11 points. Note that the dealer must continue to take cards until the total is 17 or more, at which point the dealer must stand. 
+
+
+```{r}
+library(tidyverse)
+blackjack <- function(faceup, num_hands = 10000){
+  bust <- rep(FALSE, num_hands)
+  values <- tibble(cards = rep(c(2:10,'Jack',"Queen","King","Ace"), each = 4),
+                   points = rep(c(2:10,10,10,10,11), each = 4))
+  remaining_deck <- values %>% filter(cards != faceup) %>% 
+    bind_rows(values %>% filter(cards == faceup) %>% slice(1:3))
+  
+  points <- values %>% 
+                   filter(cards == faceup) %>% 
+                   slice(1) %>%
+                   select(points) %>% pull()
+  for (i in 1:num_hands){
+    shuffle <- c(points,sample(remaining_deck$points))
+    num_cards <- 2
+    total <- sum(shuffle[1:num_cards])
+    while (total < 17){
+      num_cards <- num_cards + 1
+      total <- sum(shuffle[1:num_cards])
+    }
+    if (total > 21) {
+      bust[i] = TRUE
+    }
+  }
+  mean(bust)
+}
+jack <- blackjack("Jack")
+six <- blackjack("6")
+two <- blackjack('2')
+```
+
+- With a jack, the dealer will bust with probability equal to `r round(jack,2)`
+- With a six, the dealer will bust with probability equal to `r round(six,2)`
+- With a two, the dealer will bust with probability equal to `r round(two,2)`
+
+
+### Q2. (12 points)
+
+Use a dataset containing homes in the Seattle, WA area [http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/SeattleHousing.csv](http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/SeattleHousing.csv) for this question.
+
+```{r}
+library(tidyverse)
+seattle <- read_csv('http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/SeattleHousing.csv') %>%
+  mutate(bath_category = case_when(
+      bathrooms <= 2 ~ '0-2 bathrooms',
+      bathrooms > 2 & bathrooms <=4 ~ '2-4 bathrooms',
+      bathrooms > 4 ~ 'more than 4 bathrooms'),
+    bed_category = case_when(
+      bedrooms == 0 ~ '0 beds',
+      bedrooms > 0 & bedrooms <= 2 ~ '1-2 beds',
+      bedrooms > 2 & bedrooms <= 4 ~ '3-4 beds',
+      bedrooms > 4 ~ 'more than 4 beds'),
+    floor_category = case_when(
+      floors < 2 ~ 'less than 2 floors',
+      floors >= 2 & floors <= 3 ~ '2-3 floors',
+      floors > 3 ~ 'more than 3 floors'
+    )
+   )
+```
+
+
+#### a. (2 points)
+
+Create a  the two-by-two table containing the joint probabilities of bathrooms (grouped as: 0 - 2, more than 2 - 4, more than 4) and floors:
+(less than 2, 2 - 3, more than 3).
+```{r}
+round(table(seattle$bath_category, seattle$floor_category) / nrow(seattle), 3)
+```
+
+#### b.(2 points)
+
+Compute the joint probability of 0 - 2 bathrooms and less than 2 floors
+
+The probability is `r round(seattle %>% mutate(joint = floor_category == 'less than 2 floors' & bath_category == '0-2 bathrooms') %>% summarize(mean(joint)) %>% pull(),3)`
+
+#### c. (2 points)
+Compute marginal probability of having 0 - 2 bathrooms 
+
+The probability is `r round(seattle %>% mutate(marginal =  bath_category == '0-2 bathrooms') %>% summarize(mean(marginal)) %>% pull(),3)`
+
+#### d. (2 points)
+Compute conditional probability of having less than 2 floors given having 0 - 2 bathrooms
+
+The probability is `r round(seattle %>% filter(bath_category == '0-2 bathrooms') %>% mutate(cond = floor_category == 'less than 2 floors' ) %>% summarize(mean(cond)) %>% pull(),3)`
+
+
+#### e. (2 points)
+Compute conditional probability of having 0 - 2 bathrooms given there are less than 2 floors 
+
+The probability is `r round(seattle %>% filter(floor_category == 'less than 2 floors') %>% mutate(cond = bath_category == '0-2 bathrooms') %>% summarize(mean(cond)) %>% pull(),3)`
+
+#### f. (2 points)
+Are bathrooms and number of floors independent? Why or why not.
+
+No the probability of the number of bathrooms changes based on the number of floors.
+
+### Q3. (6 points)
+
+Bayes Rule is commonly applied with two binary variables such as test outcomes and disease outcomes. However, it can also apply with three categories.
+
+Suppose we are interested in understanding the probability that an injured person was skiing, snowboarding, or telemark skiing. (Formally, P(skiing | injured), P(snowboarding|injured), and P(telemark|injured)).
+
+Suppose
+
+- Prob(Skier) = .7
+- Prob(Snowboard) = .25
+- Prob(Telemark) = .05
+
+and
+
+- Prob(injured|skier) = .02
+- Prob(injured|snowboard) = .01
+- Prob(injured|telemark) = .10
+
+Calculate
+
+- P(skiing | injured)
+
+```{r}
+p_ski <- .7
+p_snowboard <- .25
+p_telemark <- .05
+p_inj_ski <- .02
+p_inj_sb <- .01
+p_inj_t <- .10
+
+p_ski_inj <- p_ski * p_inj_ski / (p_ski * p_inj_ski + p_snowboard * p_inj_sb + p_telemark * p_inj_t)
+
+```
+
+This probability would be `r round(p_ski_inj,2)`
+
+- P(snowboard | injured)
+
+```{r}
+p_sb_inj <- p_snowboard * p_inj_sb / (p_ski * p_inj_ski + p_snowboard * p_inj_sb + p_telemark * p_inj_t)
+```
+
+This probability would be `r round(p_sb_inj,2)`
+
+- P(telemark | injured)
+
+```{r}
+p_tele_inj <- p_telemark * p_inj_t / (p_ski * p_inj_ski + p_snowboard * p_inj_sb + p_telemark * p_inj_t)
+```
+
+This probability would be `r round(p_tele_inj,2)`
