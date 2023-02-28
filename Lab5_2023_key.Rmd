@@ -21,7 +21,7 @@ Plot and summarize the posterior distribution for each player.
 par(mfcol=c(2,1))
 x <- seq(0,1, by=.01)
 y.max <- max(dbeta(x,26,16))
-plot(x,dbeta(x,3,8), main='Bugs Bunny Posterior', type='l', ylim=c(0,y.max),ylab=expression(paste('p(',theta,'|y)')), xlab = expression(theta))
+plot(x,dbeta(x,3,6), main='Bugs Bunny Posterior', type='l', ylim=c(0,y.max),ylab=expression(paste('p(',theta,'|y)')), xlab = expression(theta))
 plot(x,dbeta(x,26,16), main='Tasmanian Devel Posterior', type='l', ylim=c(0,y.max),ylab=expression(paste('p(',theta,'|y)')), xlab = expression(theta))
 ```
 
@@ -31,7 +31,7 @@ Using the posteriors above, compute the probability that Bugs Bunny has a higher
 
 ```{r}
 num.sims <- 5000
-bugs <- rbeta(num.sims, 3, 8)
+bugs <- rbeta(num.sims, 3, 6)
 td <- rbeta(num.sims, 26, 16)
 bugs.better <- mean(bugs > td)
 ```
@@ -53,7 +53,7 @@ Plot and summarize the posterior distribution for each player.
 par(mfcol=c(2,1))
 x <- seq(0,1, by=.01)
 y.max <- max(c(dbeta(x,42,17),dbeta(x,55, 35)))
-plot(x,dbeta(x,42,17), main='Bugs Bunny Posterior', type='l', ylim=c(0,y.max),ylab=expression(paste('p(',theta,'|y)')), xlab = expression(theta))
+plot(x,dbeta(x,42,15), main='Bugs Bunny Posterior', type='l', ylim=c(0,y.max),ylab=expression(paste('p(',theta,'|y)')), xlab = expression(theta))
 plot(x,dbeta(x,55,35), main='Tasmanian Devel Posterior', type='l', ylim=c(0,y.max),ylab=expression(paste('p(',theta,'|y)')), xlab = expression(theta))
 ```
 
@@ -62,7 +62,7 @@ Using the posteriors above, compute the probability that Bugs Bunny has a higher
 
 ```{r}
 num.sims <- 5000
-bugs <- rbeta(num.sims, 42, 17)
+bugs <- rbeta(num.sims, 42, 15)
 td <- rbeta(num.sims, 55, 35)
 bugs.better <- mean(bugs > td)
 ```
