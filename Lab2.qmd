@@ -56,12 +56,12 @@ Answer the following questions with an numeric answer and a description of why t
 
 #### a. (2 points)
 
-What would be the lower 95% interval?
+What would be the lower 95% interval? (Starting at 0)
 
 
 #### b. (2 points)
 
-What would be the upper 95% interval?
+What would be the upper 95% interval? (Ending at $\infty$)
 
 
 #### c. (4 points)
@@ -77,7 +77,7 @@ Recreate the plot from above and denote these three intervals on the figure.
 
 ### Q3.
 
-For the following Beta distributions find the mean of the distribution and the shortest 95 percent interval.
+For the following Beta distributions find the mean of the distribution and your best guess for shortest 95 percent interval. An approximate interval is okay here.
 
 
 #### a. (2 points)
