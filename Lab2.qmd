@@ -100,8 +100,9 @@ Beta(1, 1)
 
 ### Q4. (10 points)
 
-What is the probability that dealer "busts" in black jack. To simplify the calculation (albeit not being entirely correct), you can treat all Aces as being worth 11 points.
+Our goal is to calculate the probability that dealer "busts" in black jack. 
 
-Note that the dealer must continue to take cards until the total is 17 or more, at which point the dealer must stand. 
+Here we will explore a simplified the calculation (albeit not being entirely correct), you can treat all Aces as being worth 11 points and assume that the dealer will take one additional card. Furthermore to simplify the problem, we will assume that the dealer has a 6 of hearts showing. So this problem will amount to simulating the dealer receiving two additional cards and adding the total of those cards (where face cards are worth 10) to determine if that total is greater than 21.
+
 
 
