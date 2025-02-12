@@ -1,0 +1,39 @@
+---
+title: "Lab 4"
+format: pdf
+editor: source
+---
+
+Use a dataset containing homes in the Seattle, WA area [http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/SeattleHousing.csv](http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/SeattleHousing.csv) for this question.
+
+
+Estimate the posterior distribution for the probability that houses in Seattle have more than 2 bathrooms.
+```{r, message = F}
+library(tidyverse)
+library(scales)
+seattle <- read_csv('http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/SeattleHousing.csv') %>% 
+  mutate(more_than2baths = bathrooms > 2)
+
+z <- sum(seattle$more_than2baths)
+N <- nrow(seattle)
+```
+
+#### 1. (2 pts)
+Justify your prior distribution.
+
+
+#### 2. (2 pts)
+State the probability model you will using. You can, but don't need, to write out the full functional form of the probability mass/distribution function.
+
+
+#### 3. (2 pts)
+What is the form of your posterior distribution?
+
+
+#### 4. (2 pts)
+Plot your prior and posterior distributions on the same figure.
+
+
+#### 5. (2 pts)
+Pretend your cousin has recently accepted a new job that requires relocating to Seattle. Summarize your findings (with regard to probability of finding a house with more than 2 bathrooms) in a non-technical manner avoiding statistical lingo.
+
