@@ -13,8 +13,7 @@ different than 70 inches.
 
 ``` r
 library(tidyverse)
-okc <- read.csv('http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/OKCupid_profiles_clean.csv', stringsAsFactors = F)
-okc.athletic <- okc %>% filter(body_type == 'athletic')
+okc <- read_csv('http://www.math.montana.edu/ahoegh/teaching/stat408/datasets/OKCupid_profiles_clean.csv')
 ```
 
 1.  (4 points)
@@ -36,24 +35,6 @@ research question.
 Now consider whether there is a height difference between OK Cupid
 respondents self-reporting their body type as “athletic” and those
 self-reporting their body type as “fit”
-
-``` r
-okc.fit <- okc %>% filter(body_type == 'fit')
-
-t.test(okc.athletic$height, okc.fit$height)
-```
-
-
-        Welch Two Sample t-test
-
-    data:  okc.athletic$height and okc.fit$height
-    t = 15.55, df = 9702.9, p-value < 2.2e-16
-    alternative hypothesis: true difference in means is not equal to 0
-    95 percent confidence interval:
-     0.9954687 1.2826521
-    sample estimates:
-    mean of x mean of y 
-     69.66950  68.53044 
 
 1.  (4 points)
 
