@@ -1,0 +1,130 @@
+---
+title: "Lab 9"
+format: gfm
+editor: source
+---
+
+For this question, we will use a historical data set with NCAA tournament results.
+
+```{r}
+#| message: false
+library(rjags)
+library(knitr)
+library(tidyverse)
+ncaa <- read_csv('https://raw.githubusercontent.com/stat456/labs/main/Lab9_data.csv') %>%
+  filter(Seed.Diff != 0) %>%
+  mutate(Seed.Diff = -1 * Seed.Diff,
+         SAG.Diff = -1 * SAG.Diff)
+```
+
+#### 1. (4 points)
+
+Create two figures to explore the impact of `Seed.Diff` and `SAG.Diff` on `Score.Diff.` Add a smoother line to approximate the relationship.
+
+
+#### 2. (4 points)
+Write a short caption to accompany each figure.
+
+
+#### 3. (4 points)
+Deviance Information Criteria (DIC) is a Bayesian analog to AIC. Consider the two model below, which do you prefer and why?
+
+```{r}
+# Model String
+modelString = "model {
+  for ( i in 1:N ) {
+    y[i] ~ dnorm(beta0 + beta1 * x[i], 1/sigma^2) # sampling model
+  }
+  beta0 ~ dnorm(M0,1/S0^2)
+  beta1 ~ dnorm(M1, 1 / S1^2)
+  sigma ~ dunif(0,C)
+} "
+writeLines( modelString, con='NORMmodel.txt')
+```
+
+```{r}
+# Runs JAGS Model: Seeds
+seeds_model <- jags.model( file = "NORMmodel.txt", 
+                           data =  list(y = ncaa$Score.Diff, 
+                                        x = ncaa$Seed.Diff,
+                                        N = nrow(ncaa), 
+                                        M0 = 0, 
+                                        S0 = .001,
+                                        M1 = 1, 
+                                        S1 = 3, 
+                                        C = 100),
+                         n.chains = 2, n.adapt = 1000)
+update(seeds_model, n.iter = 1000)
+
+seeds_coda <- coda.samples(seeds_model, 
+                          variable.names = c('beta0','beta1', 'sigma'), 
+                          n.iter = 5000)
+
+summary(seeds_coda)
+
+dic_seed <- dic.samples(seeds_model, 5000)
+dic_seed
+```
+
+```{r}
+# Runs JAGS Model: Sagarin
+sag_model <- jags.model( file = "NORMmodel.txt", 
+                           data =  list(y = ncaa$Score.Diff, 
+                                        x = ncaa$SAG.Diff,
+                                        N = nrow(ncaa), 
+                                        M0 = 0, 
+                                        S0 = .001,
+                                        M1 = .5, 
+                                        S1 = 3, 
+                                        C = 100),
+                         n.chains = 2, n.adapt = 1000)
+update(sag_model, n.iter = 1000)
+
+sag_coda <- coda.samples(sag_model, 
+                          variable.names = c('beta0','beta1', 'sigma'), 
+                          n.iter = 5000)
+
+summary(sag_coda)
+
+dic_sag <- dic.samples(sag_model, 5000)
+dic_sag
+```
+
+```{r}
+diffdic(dic_seed, dic_sag)
+```
+
+
+#### 4. (4 points)
+
+Also consider a model that includes both Sagarin and the seeds. Additionally, you can also consider interactions and/or non-linearity terms as well as the information on the highest seed to create a more sophisticated model. Choose the best one based on DIC.
+
+
+#### 5. (4 points)
+
+Write out the formal model you've selected in part 4, including all priors.
+
+\begin{eqnarray}
+  pointdiff &= \beta_0 + \beta_1 * x_{sag diff} + \epsilon \;\; \epsilon \sim N(0,\sigma^2)\\
+  \beta_0 &\sim N(0, .001^2) \\
+  \beta_1 &\sim N(1, 3^2)\\
+  \sigma &\sim Unif(0, 100)
+\end{eqnarray}
+
+
+#### 6. (4 points)
+
+Interpret your parameters in the model and summarize your findings. Assume you are telling your parents how statistics can be useful for filling out an NCAA bracket.
+
+
+#### 7. (4 points)
+
+Construct a posterior predictive distribution to calculate the winning probability of the following games (in 2023 when the Cats were in the tournament), Note your model is likely set to predict the point spread for the higher seed:
+
+1. Montana State (Seed: 14, Sagarin: 133) vs. Kansas State (Seed: 3, Sagarin: 18)
+2. Purdue (Seed: 1, Sagarin: 9) vs. Farleigh Dickinson (Seed: 16, Sagarin: 310)
+3. Arizona (Seed: 2, Sagarin: 10) vs. Princeton (Seed 15:, Sagarin: 118)
+4. Connecticut (Seed: 4, Sagarin: 4) vs. Iona (Seed: 13, Sagarin: 86)
+
+
+Create a visualization of the posterior predictive distributions for each of these 4 scenarios and include the upset probabilities on the figure.
