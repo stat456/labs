@@ -1,8 +1,7 @@
-# Lab 11: Key
+# Lab 11
 
-This lab will contain two parts. The first part will be to present the
-framework for a hierarchical model in the normal setting. The second
-part will be a continuation of the activity from Tuesday.
+This lab will present the
+framework for a hierarchical model in the normal setting. 
 
 ``` r
 library(rjags)
@@ -10,7 +9,6 @@ library(knitr)
 library(tidyverse)
 ```
 
-## Part 1
 
 Consider a hierarchical normal model
 
